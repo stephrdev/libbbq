@@ -12,6 +12,7 @@ class Serial {
 		uint8_t isReady(void);
 
 		void print(const char input[]);
+		void printNumber(uint8_t intput);
 		void printLine(const char input[]);
 		uint8_t readLine(char line[], uint8_t maxLength);
 };

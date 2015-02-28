@@ -51,6 +51,12 @@ void Serial::print(const char input[]) {
 	}
 }
 
+void Serial::printNumber(uint8_t input) {
+	transmitByte('0' + (input / 100));
+	transmitByte('0' + ((input / 10) % 10));
+	transmitByte('0' + (input % 10));
+}
+
 void Serial::printLine(const char input[]) {
 	print(input);
 	// Add newline and return chars.
