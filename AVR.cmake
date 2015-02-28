@@ -1,6 +1,7 @@
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_CROSSCOMPILING 1)
 
+
 # Get some tools we need.
 find_program(AVR_CC avr-gcc)
 find_program(AVR_CXX avr-g++)
@@ -8,6 +9,7 @@ find_program(AVR_OBJCOPY avr-objcopy)
 find_program(AVR_OBJDUMP avr-objdump)
 find_program(AVR_SIZE avr-size)
 find_program(AVR_AVRDUDE avrdude)
+find_program(AVR_SERIAL picocom)
 
 # Configure compilers.
 set(CMAKE_C_COMPILER   ${AVR_CC})
@@ -16,6 +18,7 @@ set(CMAKE_CXX_COMPILER ${AVR_CXX})
 # Compiler and linker flags.
 set(AVR_COMPILE_FLAGS "-Wall -Wl,--relax -g -Os -mcall-prologues -fno-exceptions")
 set(AVR_COMPILE_FLAGS "${AVR_COMPILE_FLAGS} -ffunction-sections -fdata-sections")
+set(AVR_COMPILE_FLAGS "${AVR_COMPILE_FLAGS} -fshort-enums")
 set(AVR_COMPILE_FLAGS "${AVR_COMPILE_FLAGS} -mmcu=${AVR_MCU} -DF_CPU=${AVR_F_CPU}UL")
 set(AVR_LINK_FLAGS "-Wl,--gc-sections -Wl,--relax -lm -mmcu=${AVR_MCU}")
 
@@ -24,6 +27,11 @@ set(AVR_AVRDUDE_TYPE "arduino")
 set(AVR_AVRDUDE_PORT "/dev/ttyUSB0")
 set(AVR_AVRDUDE_BAUD 57600)
 set(AVR_AVRDUDE_ARGS "-V")
+
+# Serial flags
+set(AVR_SERIAL_PORT "/dev/ttyUSB0")
+set(AVR_SERIAL_BAUD 9600)
+set(AVR_SERIAL_ARGS -b ${AVR_SERIAL_BAUD} ${AVR_SERIAL_PORT})
 
 
 function(avr_add_firmware TARGET)
@@ -83,6 +91,10 @@ function(avr_add_firmware TARGET)
 		disasm
 		${AVR_OBJDUMP} -h -S ${elf_file} > ${lst_file}
 		DEPENDS ${elf_file}
+	)
+	add_custom_target(
+		serial
+		${AVR_SERIAL} ${AVR_SERIAL_ARGS}
 	)
 endfunction()
 
