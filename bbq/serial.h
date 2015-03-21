@@ -5,14 +5,19 @@ class Serial {
 	public:
 		Serial(uint16_t speed);
 
-		void transmitByte(uint8_t input);
-		uint8_t receiveByte(void);
+		// Basic input/output.
+		void transmit_byte(uint8_t input);
+		uint8_t receive_byte(void);
 
-		uint8_t hasData(void);
-		uint8_t isReady(void);
+		// Helpers to read flags.
+		uint8_t has_data(void);
+		uint8_t is_ready(void);
 
-		void print(const char input[]);
-		void printNumber(uint8_t intput);
-		void printLine(const char input[]);
-		uint8_t readLine(char line[], uint8_t maxLength);
+		// Transmit helpers.
+		void transmit_number(uint8_t input);
+		void transmit_text(const char input[]);
+		void transmit_text(const char input[], bool newline);
+
+		// Receive helpers.
+		uint8_t receive_text(char output[], uint8_t max_length);
 };

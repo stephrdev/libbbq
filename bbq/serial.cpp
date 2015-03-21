@@ -23,65 +23,68 @@ Serial::Serial(uint16_t speed) {
 	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
 }
 
-void Serial::transmitByte(uint8_t input) {
+void Serial::transmit_byte(uint8_t input) {
 	// Wait for an empty transmit buffer
 	loop_until_bit_is_set(UCSR0A, UDRE0);
 	UDR0 = input;
 }
 
-uint8_t Serial::receiveByte(void) {
+uint8_t Serial::receive_byte(void) {
 	// Data available, data available, data available?
 	loop_until_bit_is_set(UCSR0A, RXC0);
 	return UDR0;
 }
 
-uint8_t Serial::hasData(void) {
+uint8_t Serial::has_data(void) {
 	return bit_is_set(UCSR0A, RXC0);
 }
 
-uint8_t Serial::isReady(void) {
+uint8_t Serial::is_ready(void) {
 	return bit_is_set(UCSR0A, UDRE0);
 }
 
-void Serial::print(const char input[]) {
+void Serial::transmit_number(uint8_t input) {
+	transmit_byte('0' + (input / 100));
+	transmit_byte('0' + ((input / 10) % 10));
+	transmit_byte('0' + (input % 10));
+}
+
+void Serial::transmit_text(const char input[]) {
 	uint8_t i = 0;
 	while (input[i]) {
-		transmitByte(input[i]);
+		transmit_byte(input[i]);
 		i++;
 	}
 }
 
-void Serial::printNumber(uint8_t input) {
-	transmitByte('0' + (input / 100));
-	transmitByte('0' + ((input / 10) % 10));
-	transmitByte('0' + (input % 10));
+void Serial::transmit_text(const char input[], bool newline) {
+	transmit_text(input);
+
+	if (newline) {
+		// Add newline and return chars.
+		transmit_byte('\r');
+		transmit_byte('\n');
+	}
 }
 
-void Serial::printLine(const char input[]) {
-	print(input);
-	// Add newline and return chars.
-	transmitByte('\r');
-	transmitByte('\n');
-}
-
-uint8_t Serial::readLine(char line[], uint8_t maxLength) {
+uint8_t Serial::receive_text(char output[], uint8_t max_length) {
 	uint8_t received, i;
 
-	for(i = 0; i < maxLength; i++) {
+	for(i = 0; i < max_length; i++) {
 		// Get byte and echo back.
-		received = receiveByte();
-		transmitByte(received);
+		received = receive_byte();
+		transmit_byte(received);
 
 		if (received == '\r') {
 			// End of line. We're done.
 			break;
 		} else {
-			line[i] = received;
+			output[i] = received;
 			i++;
 		}
 	}
 
 	// Add NULL to the end.
-	line[i] = '\0';
+	output[i] = '\0';
 	return i;
 }
