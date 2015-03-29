@@ -43,6 +43,16 @@ uint8_t Serial::is_ready(void) {
 	return bit_is_set(UCSR0A, UDRE0);
 }
 
+void Serial::transmit_number(int8_t input) {
+	if (input < 0) {
+		transmit_byte('-');
+		transmit_number((uint8_t)(input * -1));
+	} else {
+		transmit_byte('+');
+		transmit_number((uint8_t)(input));
+	}
+}
+
 void Serial::transmit_number(uint8_t input) {
 	transmit_byte('0' + (input / 100));
 	transmit_byte('0' + ((input / 10) % 10));

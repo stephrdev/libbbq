@@ -14,6 +14,7 @@ class Serial {
 		uint8_t is_ready(void);
 
 		// Transmit helpers.
+		void transmit_number(int8_t input);
 		void transmit_number(uint8_t input);
 		void transmit_text(const char input[]);
 		void transmit_text(const char input[], bool newline);
